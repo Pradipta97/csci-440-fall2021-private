@@ -31,6 +31,7 @@ public class Customer extends Model {
         lastName = results.getString("LastName");
         customerId = results.getLong("CustomerId");
         supportRepId = results.getLong("SupportRepId");
+        email = results.getString("Email");
     }
 
     public String getFirstName() {
@@ -60,9 +61,24 @@ public class Customer extends Model {
     public static List<Customer> all(int page, int count) {
         try (Connection conn = DB.connect();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT * FROM customers LIMIT ?"
+                     "SELECT * FROM customers LIMIT ? OFFSET ?"
              )) {
             stmt.setInt(1, count);
+
+            if (page == 1)
+                stmt.setInt(2, 0);
+
+             if (page == 2)
+                stmt.setInt(2, count);
+
+            if (page > 2)
+                stmt.setInt(2, (page-1)*count);
+
+             else
+                stmt.setInt(2, 0);
+
+
+
             ResultSet results = stmt.executeQuery();
             List<Customer> resultList = new LinkedList<>();
             while (results.next()) {
@@ -73,6 +89,7 @@ public class Customer extends Model {
             throw new RuntimeException(sqlException);
         }
     }
+
 
     public static Customer find(long customerId) {
         try (Connection conn = DB.connect();

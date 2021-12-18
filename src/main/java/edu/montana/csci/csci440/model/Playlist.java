@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,10 +22,25 @@ public class Playlist extends Model {
         playlistId = results.getLong("PlaylistId");
     }
 
+    public static List<Playlist> track(Long trackId) {
+        String query = "SELECT * FROM playlists WHERE PlaylistId IN (SELECT playlist_track.PlaylistId FROM playlist_track WHERE TrackId = ?)";
+        try (Connection conn = DB.connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setLong(1, trackId);
+            ResultSet results = stmt.executeQuery();
+            List<Playlist> resultList = new LinkedList<>();
+            while (results.next()) {
+                resultList.add(new Playlist(results));
+            }
+            return resultList;
+        } catch (SQLException sqlException) {
+            throw new RuntimeException(sqlException);
+        }
+    }
+
 
     public List<Track> getTracks(){
-        // TODO implement, order by track name
-        return Collections.emptyList();
+        return Track.forPlaylist(playlistId);
     }
 
     public Long getPlaylistId() {
@@ -48,9 +62,20 @@ public class Playlist extends Model {
     public static List<Playlist> all(int page, int count) {
         try (Connection conn = DB.connect();
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT * FROM playlists LIMIT ?"
+                     "SELECT * FROM playlists LIMIT ? OFFSET ?"
              )) {
             stmt.setInt(1, count);
+            if (page == 1)
+                stmt.setInt(2, 0);
+
+            if (page == 2)
+                stmt.setInt(2, count);
+
+            if (page > 2)
+                stmt.setInt(2, (page-1)*count);
+            else
+                stmt.setInt(2, 0);
+
             ResultSet results = stmt.executeQuery();
             List<Playlist> resultList = new LinkedList<>();
             while (results.next()) {
