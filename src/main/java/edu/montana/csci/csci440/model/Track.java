@@ -88,7 +88,7 @@ public class Track extends Model {
     public void delete() {
         try (Connection conn = DB.connect();
              PreparedStatement stmt = conn.prepareStatement(
-                     "DELETE FROM tracks WHERE TrackId=?")) { //simple delete query by trackId
+                     "DELETE FROM tracks WHERE TrackId=?")) {
             stmt.setLong(1, this.getTrackId());
             stmt.executeUpdate();
         } catch (SQLException sqlException) {
@@ -250,7 +250,7 @@ public class Track extends Model {
                 "WHERE name LIKE ?";
         args.add("%" + search + "%");
 
-        // Conditionally include the query and argument
+
         if (artistId != null) {
             query += " AND ArtistId=? ";
             args.add(artistId);
@@ -311,7 +311,7 @@ public class Track extends Model {
         }
     }
 
-    //track data function
+
 
 
     public static List<Track> all() {
