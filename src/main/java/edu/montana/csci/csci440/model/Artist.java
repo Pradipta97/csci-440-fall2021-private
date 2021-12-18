@@ -58,18 +58,17 @@ public class Artist extends Model {
              )) {stmt.setInt(1, count);
             if (page == 1)
                 stmt.setInt(2, 0);
-
-            if (page == 2)
+             if (page == 2)
                 stmt.setInt(2, count);
-
-           if (page > 2)
+             if (page > 2)
                 stmt.setInt(2, (page-1)*count);
 
-            else {
+            else
                 stmt.setInt(2, 0);
-            }
+
             stmt.setInt(1, count);
             ResultSet results = stmt.executeQuery();
+            resultList = new LinkedList<>();
             while (results.next()) {
                 resultList.add(new Artist(results));
             }
@@ -78,6 +77,7 @@ public class Artist extends Model {
             throw new RuntimeException(sqlException);
         }
     }
+
 
     public boolean verify() {
         _errors.clear(); // clear any existing errors
