@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,25 +23,10 @@ public class Playlist extends Model {
         playlistId = results.getLong("PlaylistId");
     }
 
-    public static List<Playlist> track(Long trackId) {
-        String query = "SELECT * FROM playlists WHERE PlaylistId IN (SELECT playlist_track.PlaylistId FROM playlist_track WHERE TrackId = ?)";
-        try (Connection conn = DB.connect();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setLong(1, trackId);
-            ResultSet results = stmt.executeQuery();
-            List<Playlist> resultList = new LinkedList<>();
-            while (results.next()) {
-                resultList.add(new Playlist(results));
-            }
-            return resultList;
-        } catch (SQLException sqlException) {
-            throw new RuntimeException(sqlException);
-        }
-    }
 
 
     public List<Track> getTracks(){
-        return Track.forPlaylist(playlistId);
+        return Collections.EMPTY_LIST;
     }
 
     public Long getPlaylistId() {
