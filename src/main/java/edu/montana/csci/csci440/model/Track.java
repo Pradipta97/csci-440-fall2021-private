@@ -161,7 +161,7 @@ public class Track extends Model {
     public Genre getGenre() {
         return null;
     }
-    public List<Playlist> getPlaylists(){ return Playlist.track(trackId);}
+    public List<Playlist> getPlaylists(){ return Collections.EMPTY_LIST;}
 
 
     public Long getTrackId() {
@@ -313,24 +313,6 @@ public class Track extends Model {
 
     //track data function
 
-    public static List<Track> forPlaylist(Long playlistId) {
-        String query = "SELECT * FROM tracks" + "" +
-                "WHERE trackId IN (SELECT playlist_track.TrackId" +
-                " FROM playlist_track WHERE PlaylistId = ?)" +
-                "ORDER BY Name";
-        try (Connection conn = DB.connect();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setLong(1, playlistId);
-            ResultSet results = stmt.executeQuery();
-            List<Track> resultList = new LinkedList<>();
-            while (results.next()) {
-                resultList.add(new Track(results));
-            }
-            return resultList;
-        } catch (SQLException sqlException) {
-            throw new RuntimeException(sqlException);
-        }
-    }
 
     public static List<Track> all() {
         return all(0, Integer.MAX_VALUE);
